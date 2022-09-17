@@ -12,6 +12,6 @@ exports.createSauce = (req, res, next) => {
     });
 
     sauce.save()
-    .then(() => { res.status(201).json({ message: "Sauce enregistrée" }) })
-    .catch(error => { res.status(400).json({ message: " Demande erronnée" }) })
+    .then(() => { res.status(201).json({ message: "Sauce enregistrée" })})
+    .catch(error => { res.status(400).json({ message: "Demande erronnée" })})
 }
