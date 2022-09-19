@@ -14,4 +14,54 @@ exports.createSauce = (req, res, next) => {
     sauce.save()
     .then(() => { res.status(201).json({ message: "Sauce enregistrée" })})
     .catch(error => { res.status(400).json({ message: "Demande erronnée" })})
+};
+
+exports.modifySauce = (req, res, next) => {
+    const sauceObject = req.file ? {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+    } : { ...req.body };
+
+    delete sauceObject._userId;
+    sauceModel.findOne({_id: req.params.id})
+    .then((sauce) => {
+        if (sauce.userId != req.auth.userId) {
+            res.status(400).json({ message : "Bad Request" });
+        } else {
+            sauceModel.updateOne({ _id: req.params.id}, { ...sauceModel, _id: req.params.id })
+            .then(() => res.status(200).json({ message: "Sauce Modifiée" }))
+            .catch(error => res.status(401).json({ message: "Unauthorized" }));
+        }
+    })
+    .catch((error) => {
+        res.status(400).json({ message: "Bad Request" });
+    })
+};
+
+exports.getOneSauce = (req, res, next) => {
+    sauceModel.findOne({ _id: req.params.id })
+        .then(sauce => res.status(200).json(sauce))
+        .catch(error => res.status(404).json({ message: "Not Found" }));
+};
+
+exports.deleteSauce = (req, res, next) => {
+    sauceModel.findOne({ _id: req.params.id })
+    .then((sauce) => {
+        if(sauce.userId != req.auth.userId) {
+            res.status(400).json({ message: "Non-autorisé" });
+        } else {
+            const filename = sauce.imageUrl.split("/images/")[1];
+            fs.unlink(`images/${filename}`, () => {
+                sauceModel.deleteOne({_id: req.params.id })
+                .then(() => res.staus(200).json({ message: "Sauce Supprimé"}))
+                .catch(error => res.status(401).json({ message: "Unauthorized" }));
+            })
+        }
+    })
+};
+
+exports.getAllSauces = (req, res, next) => {
+    sauceModel.find()
+    .then(sauces => res.status(200).json(sauces))
+    .catch(error => res.status(400).json({ message: "Demande erronnée" }));
 }
