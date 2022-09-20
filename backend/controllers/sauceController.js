@@ -13,7 +13,7 @@ exports.createSauce = (req, res, next) => {
 
     sauce.save()
     .then(() => { res.status(201).json({ message: "Sauce enregistrée" })})
-    .catch(error => { res.status(400).json({ message: "Demande erronnée" })})
+    .catch(error => { res.status(400).json({ error })})
 };
 
 exports.modifySauce = (req, res, next) => {
@@ -30,18 +30,18 @@ exports.modifySauce = (req, res, next) => {
         } else {
             sauceModel.updateOne({ _id: req.params.id}, { ...sauceModel, _id: req.params.id })
             .then(() => res.status(200).json({ message: "Sauce Modifiée" }))
-            .catch(error => res.status(401).json({ message: "Unauthorized" }));
+            .catch(error => res.status(401).json({ error }));
         }
     })
     .catch((error) => {
-        res.status(400).json({ message: "Bad Request" });
+        res.status(400).json({ error });
     })
 };
 
 exports.getOneSauce = (req, res, next) => {
     sauceModel.findOne({ _id: req.params.id })
         .then(sauce => res.status(200).json(sauce))
-        .catch(error => res.status(404).json({ message: "Not Found" }));
+        .catch(error => res.status(404).json({ error }));
 };
 
 exports.deleteSauce = (req, res, next) => {
@@ -54,7 +54,7 @@ exports.deleteSauce = (req, res, next) => {
             fs.unlink(`images/${filename}`, () => {
                 sauceModel.deleteOne({_id: req.params.id })
                 .then(() => res.staus(200).json({ message: "Sauce Supprimé"}))
-                .catch(error => res.status(401).json({ message: "Unauthorized" }));
+                .catch(error => res.status(401).json({ error }));
             })
         }
     })
@@ -63,5 +63,5 @@ exports.deleteSauce = (req, res, next) => {
 exports.getAllSauces = (req, res, next) => {
     sauceModel.find()
     .then(sauces => res.status(200).json(sauces))
-    .catch(error => res.status(400).json({ message: "Demande erronnée" }));
+    .catch(error => res.status(400).json({ error }));
 }
