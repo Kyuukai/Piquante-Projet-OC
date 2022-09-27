@@ -17,6 +17,7 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
+    require('dotenv').config();
     User.findOne({ email: req.body.email })
         .then(user => {
             if (user === null) {
@@ -31,7 +32,7 @@ exports.login = (req, res, next) => {
                                 userId: user._id,
                                 token: jwt.sign(
                                     { userId: user._id },
-                                    "RANDOM_TOKEN_SECRET",
+                                    process.env.DB_TOKEN,
                                     { expiresIn: "24h" }
                                 )
                             });

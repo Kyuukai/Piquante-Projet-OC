@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
+const helmet = require('helmet');
 
 // Importation des Routes
 const sauceRoutes = require("./routes/sauces");
@@ -38,5 +39,8 @@ app.use("/api/sauces", sauceRoutes);
 
 // Midleware qui permet de charger les fichiers qui sont dans le repertoire images
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
+// On utilise helmet pour plusieurs raisons notamment la mise en place du X-XSS-Protection afin d'activer le filtre de script intersites(XSS) dans les navigateurs web
+app.use(helmet());
 
 module.exports = app;
