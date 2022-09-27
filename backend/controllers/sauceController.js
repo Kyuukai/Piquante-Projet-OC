@@ -30,10 +30,6 @@ exports.modifySauce = (req, res, next) => {
         if (sauce.userId != req.auth.userId) {
             res.status(400).json({ message : "Bad Request" });
         } else {
-            if (req.file) {
-                const filename = sauce.imageUrl.split("/images/")[1];
-                fs.unlink(`images/${filename}`, () => {})
-            }
             sauceModel.updateOne({ ...sauceObject, _id: req.params.id })
             .then(() => res.status(200).json({ message: "Sauce Modifiée" }))
             .catch(error => res.status(401).json({ error }));
