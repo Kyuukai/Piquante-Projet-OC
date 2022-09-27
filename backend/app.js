@@ -1,13 +1,17 @@
+// Importation des plugins
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
 
+// Importation des Routes
 const sauceRoutes = require("./routes/sauces");
 const userRoutes = require("./routes/user");
 
-mongoose.connect("mongodb+srv://Kyuukai:475665@cluster0.yopxihw.mongodb.net/?retryWrites=true&w=majority",
+// Connection à MongoDB avec la string de connection fournie depuis le site
+require('dotenv').config();
+mongoose.connect(process.env.DB_ADMIN,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -17,6 +21,7 @@ mongoose.connect("mongodb+srv://Kyuukai:475665@cluster0.yopxihw.mongodb.net/?ret
 
 app.use(express.json());
 
+// Middleware Header pour contourner les erreurs en débloquant certains systèmes de sécurité CORS, afin que tout le monde puisse faire des requetes depuis son navigateur
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization");
@@ -24,10 +29,14 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware qui permet de parser les requêtes envoyées par le client, on peut y accéder grâce à req.body
 app.use(bodyParser.json());
 
+// Middleware qui va transmettre les requêtes vers ces url vers les routes correspondantes
 app.use("/api/auth", userRoutes);
 app.use("/api/sauces", sauceRoutes);
+
+// Midleware qui permet de charger les fichiers qui sont dans le repertoire images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
